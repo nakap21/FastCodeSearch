@@ -1,0 +1,1 @@
+# Базовое решение Fast Codesearch
