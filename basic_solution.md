@@ -130,7 +130,7 @@ Fast Codesearch started
 -- Остановить движок
 ```
 ./fastsearch stop
-Fast Codesearch stoped
+Fast Codesearch stopped
 ```
 
 -- Добавить файлы по указанному пути в движок
