@@ -10,7 +10,6 @@ add_subdirectory(src/models)
 add_subdirectory(src/libs/boost-cmake)
 add_subdirectory(src/libs/re2)
 
-
 find_package(Threads)
 
 target_link_libraries(models Boost::filesystem Boost::boost Boost::serialization Threads::Threads re2::re2 stdc++fs)
