@@ -6,7 +6,6 @@
 #include <sys/stat.h>
 #include <sys/mman.h>
 
-
 using namespace re2;
 
 namespace {
@@ -120,7 +119,6 @@ Search(const std::string &regex, const std::unordered_map<int, std::unordered_se
         while (re2::RE2::FindAndConsume(&file, regex_for_match, &result)) {
             search_result.push_back({path, result.data() - file_begin.data()});
         }
-        return search_result;
     }
-
+    return search_result;
 }

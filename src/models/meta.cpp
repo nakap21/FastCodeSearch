@@ -11,9 +11,7 @@ Meta::Meta() {
     try {
         text_iarchive ia{file};
         ia >> *this;
-    } catch (const std::exception &ex) {
-        std::cout << "No meta file " << ex.what() << "\n";
-    }
+    } catch (const std::exception &ex) {}
 }
 
 void Meta::SaveMeta() {

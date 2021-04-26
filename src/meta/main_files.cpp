@@ -82,5 +82,4 @@ int main(int argc, char *argv[]) {
     } else {
         AddFiles(files);
     }
-    std::cout << "Finised! " << std::endl;
 }

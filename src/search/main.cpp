@@ -7,7 +7,6 @@
 int main(int argc, char *argv[]) {
     Shards shards;
     shards.LoadShards();
-    std::cout << argc << std::endl;
     if (argc <= 1) {
         std::cout << "no regex to search\n";
         return 0;

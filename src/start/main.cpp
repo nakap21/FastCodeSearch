@@ -51,8 +51,8 @@ namespace {
         for (const auto &file: cur_meta.GetFiles()) {
             files_to_add.insert(file.first);
         }
-        auto kek = meta.GetFiles();
-        for (const auto &file: kek) {
+        auto files_in_meta = meta.GetFiles();
+        for (const auto &file: files_in_meta) {
             auto it = cur_meta.GetFiles().find(file.first);
             files_to_add.erase(file.first);
             if (it == cur_meta.GetFiles().end()) {
@@ -91,4 +91,5 @@ int main() {
         }
         std::this_thread::sleep_for(std::chrono::seconds(meta.GetUpdateIntervalSec().value));
     }
+    // TODO clean logic
 }

@@ -25,7 +25,7 @@ public:
 
     const std::unordered_map<std::string, time_t> &GetFiles() const { return files; }
 
-    bool ShouldStopEngine() { return false; }
+    bool ShouldStopEngine() { return false; } // TODO add stop logic
 
 private:
     friend class boost::serialization::access;
