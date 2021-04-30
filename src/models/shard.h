@@ -18,6 +18,8 @@ public:
 
     void LoadShards();
 
+    void Clear();
+
     std::vector<Index> GetIndexData();
 
     const std::unordered_map<std::string, int> &GetFilesShard() { return files_shard; }

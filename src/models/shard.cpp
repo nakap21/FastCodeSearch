@@ -1,8 +1,10 @@
 #include "shard.h"
 
+#include <experimental/filesystem>
 #include <fstream>
 
 using namespace boost::archive;
+namespace fs = std::experimental::filesystem;
 
 namespace {
 
@@ -85,10 +87,20 @@ void Shards::LoadShards() {
 
 std::vector<Index> Shards::GetIndexData() {
     std::vector<Index> indexes;
-    for (int i = 0; i < files_cnt_on_shrads.size(); ++i) {
+    for (size_t i = 0; i < files_cnt_on_shrads.size(); ++i) {
         auto index_file_name = GetIndexFileName(i);
         auto index = LoadIndex(index_file_name);
         indexes.push_back(index);
     }
     return indexes;
+}
+
+void Shards::Clear() {
+    for (size_t i = 0; i < files_cnt_on_shrads.size(); ++i) {
+        auto index_file_name = GetIndexFileName(i);
+        fs::remove(index_file_name);
+    }
+    files_cnt_on_shrads.clear();
+    files_shard.clear();
+    fs::remove("shards.txt");
 }

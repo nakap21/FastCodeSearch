@@ -19,24 +19,30 @@ public:
 
     void DeleteFile(const std::string &);
 
+    void StopEngine();
+
+    void Clear();
+
     const UpdateIntervalSec &GetUpdateIntervalSec() const { return UPDATE_INTERVAL_SEC; }
 
     const CntFilesInShard &GetCntFilesInShard() const { return CNT_FILES_IN_SHARD; }
 
     const std::unordered_map<std::string, time_t> &GetFiles() const { return files; }
 
-    bool ShouldStopEngine() { return false; } // TODO add stop logic
+    bool ShouldStopEngine() { return should_stop_engine; }
 
 private:
     friend class boost::serialization::access;
 
     template<class Archive>
     void serialize(Archive &archive, const unsigned int version) {
+        archive & BOOST_SERIALIZATION_NVP(should_stop_engine);
         archive & BOOST_SERIALIZATION_NVP(UPDATE_INTERVAL_SEC);
         archive & BOOST_SERIALIZATION_NVP(CNT_FILES_IN_SHARD);
         archive & BOOST_SERIALIZATION_NVP(files);
     }
 
+    bool should_stop_engine = false;
     UpdateIntervalSec UPDATE_INTERVAL_SEC;
     CntFilesInShard CNT_FILES_IN_SHARD;
     std::unordered_map<std::string, time_t> files;

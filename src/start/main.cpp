@@ -19,11 +19,14 @@ namespace {
     bool ShouldUpdateMeta(const Meta &meta) {
         Meta cur_meta;
         return cur_meta.GetUpdateIntervalSec().value != meta.GetUpdateIntervalSec().value ||
-               cur_meta.GetCntFilesInShard().value != meta.GetCntFilesInShard().value;
+               cur_meta.GetCntFilesInShard().value != meta.GetCntFilesInShard().value || cur_meta.ShouldStopEngine();
     }
 
     void UpdateMeta(Meta &meta) {
         Meta cur_meta;
+        if (cur_meta.ShouldStopEngine()) {
+            meta.StopEngine();
+        }
         meta.SetUpdateIntervalSec(cur_meta.GetUpdateIntervalSec().value);
         meta.SetCntFilesInShard(cur_meta.GetCntFilesInShard().value);
         meta.SaveMeta();
@@ -85,11 +88,14 @@ int main() {
     while (!meta.ShouldStopEngine()) {
         if (ShouldUpdateMeta(meta)) {
             UpdateMeta(meta);
+            shards.Clear();
+            shards = CreateIndex(meta);
         }
         if (ShouldUpdateIndex(meta)) {
             UpdateIndex(shards, meta);
         }
         std::this_thread::sleep_for(std::chrono::seconds(meta.GetUpdateIntervalSec().value));
     }
-    // TODO clean logic
+    shards.Clear();
+    meta.Clear();
 }

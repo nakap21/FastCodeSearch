@@ -1,10 +1,12 @@
 #include "meta.h"
 
+#include <experimental/filesystem>
 #include <fstream>
 #include <iostream>
 #include <sys/stat.h>
 
 using namespace boost::archive;
+namespace fs = std::experimental::filesystem;
 
 Meta::Meta() {
     std::ifstream file{"meta_info.txt"};
@@ -36,4 +38,12 @@ void Meta::SetUpdateIntervalSec(int new_value) {
 
 void Meta::SetCntFilesInShard(int new_value) {
     CNT_FILES_IN_SHARD.value = new_value;
+}
+
+void Meta::Clear() {
+    fs::remove("meta_info.txt");
+}
+
+void Meta::StopEngine() {
+    should_stop_engine = true;
 }
