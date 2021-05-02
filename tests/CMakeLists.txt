@@ -11,7 +11,8 @@ enable_testing()
 
 add_executable(
         hello_test
-        simple_test.cpp
+        regex_query_test.cpp
+        ../src/search/regex.cpp
 )
 target_link_libraries(
         hello_test

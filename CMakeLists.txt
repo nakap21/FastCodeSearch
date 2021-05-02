@@ -1,8 +1,6 @@
 cmake_minimum_required(VERSION 3.17)
 project(FastCodeSearch CXX)
 
-#set (CMAKE_C_FLAGS "-std=gnu99 ${CMAKE_C_FLAGS}")
-
 set(CMAKE_CXX_STANDARD 17)
 
 add_subdirectory(src/start)

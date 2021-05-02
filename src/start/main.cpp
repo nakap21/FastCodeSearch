@@ -1,3 +1,4 @@
+#include "../models/meta.h"
 #include "../models/shard.h"
 
 #include <chrono>
