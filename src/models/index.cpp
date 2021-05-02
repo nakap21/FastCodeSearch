@@ -9,7 +9,7 @@ void Index::AddFile(const std::string &path) {
     in.get(a);
     in.get(b);
     while (in.get(c)) {
-        int tr = a * 256 * 256 + b * 256 + c;
+        int tr = std::tolower(a) * 256 * 256 + std::tolower(b) * 256 + std::tolower(c);
         index[tr].insert(path);
         a = b;
         b = c;

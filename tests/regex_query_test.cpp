@@ -8,7 +8,7 @@ struct QueryTest {
 };
 
 std::vector<QueryTest> params = {
-        {"abcdef", RegexQuery::kOr, {"abcdef"}},
+        {"Abcdef", RegexQuery::kOr, {"abcdef"}},
         {"b", RegexQuery::kAll, {}},
         {"abc(def|ghi)", RegexQuery::kOr, {"abcdef", "abcghi"}},
 };
