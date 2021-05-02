@@ -1,4 +1,4 @@
-add_executable(search main.cpp search.cpp)
+add_executable(search main.cpp search.cpp regex.cpp)
 
 set_target_properties(search
         PROPERTIES

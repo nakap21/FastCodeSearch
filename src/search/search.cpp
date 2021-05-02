@@ -6,6 +6,8 @@
 #include <sys/stat.h>
 #include <sys/mman.h>
 
+#include <iostream>
+
 using namespace re2;
 
 namespace {
@@ -41,63 +43,57 @@ namespace {
         return result;
     }
 
-    std::unordered_set<std::string> OrTrigrams(const std::vector<int> &trigrams,
-                                               const std::unordered_map<int, std::unordered_set<std::string>> &index) {
-        if (trigrams.empty()) {
-            return {};
-        }
-        std::unordered_set<std::string> result = GetFilesWithTr(trigrams[0], index);
-        for (size_t i = 1; i < trigrams.size(); ++i) {
-            for (const auto &cur: result) {
-                auto cur_files = GetFilesWithTr(trigrams[i], index);
-                for (const auto &to_add: cur_files) {
-                    result.insert(to_add);
-                }
+    std::unordered_set<std::string> GetAllFiles(const std::unordered_map<int, std::unordered_set<std::string>> &index) {
+        std::unordered_set<std::string> files;
+        for (const auto& tr: index) {
+            for (const auto& file: tr.second) {
+                files.insert(file);
             }
         }
+        return files;
+    }
+
+    std::vector<int> GetTrigrams(const std::string& regex) {
+        std::vector<int> trigrams;
+        char a, b, c;
+        a = regex[0];
+        b = regex[1];
+        for (size_t i = 2; i < regex.size(); ++i) {
+            c = regex[i];
+            int tr = a * 256 * 256 + b * 256 + c;
+            trigrams.push_back(tr);
+            a = b;
+            b = c;
+        }
+        return trigrams;
+    }
+
+    std::unordered_set<std::string> GetFilesToSearch(const RegexQuery& query, const std::unordered_map<int, std::unordered_set<std::string>> &index) {
+        if (query.GetOperation() == RegexQuery::kAll) {
+            return GetAllFiles(index);
+        }
+
+        std::unordered_set<std::string> files;
+        for (const auto& regex: query.GetSubs()) {
+            if (regex.size() < 3) {
+                return GetAllFiles(index);
+            }
+            auto trigrams = GetTrigrams(regex);
+            auto files_for_trigrams = AndTrigrams(trigrams, index);
+            for (const auto& new_file: files_for_trigrams) {
+                files.insert(new_file);
+            }
+        }
+        return files;
     }
 
 }
 
-Query::Query(const std::string &regex) {
-//    TODO library for parsing regex
-//    TODO add kAll for size < 3 and other cases
-    operation = kAnd;
-    char a, b, c;
-    a = regex[0];
-    b = regex[1];
-    for (size_t i = 2; i < regex.size(); ++i) {
-        c = regex[i];
-        int tr = a * 256 * 256 + b * 256 + c;
-        trigrams.push_back(tr);
-        a = b;
-        b = c;
-    }
-
-}
-
-std::unordered_set<std::string>
-Query::ExecuteQuery(const std::unordered_map<int, std::unordered_set<std::string>> &index) {
-    std::unordered_set<std::string> result;
-    if (operation == kAnd) {
-        result = AndTrigrams(trigrams, index);
-    } else {
-        result = OrTrigrams(trigrams, index);
-    }
-
-    if (sub != nullptr) {
-//        TODO
-    }
-
-    return result;
-}
 
 std::vector<SearchResult>
-Search(const std::string &regex, const std::unordered_map<int, std::unordered_set<std::string>> &index) {
+Search(const RegexQuery& query, const std::unordered_map<int, std::unordered_set<std::string>> &index) {
     std::vector<SearchResult> search_result;
-    Query regex_query(regex);
-    auto files_to_search = regex_query.ExecuteQuery(index);
-
+    auto files_to_search = GetFilesToSearch(query, index);
     for (const auto &path: files_to_search) {
         int fdin;
         void *src;
@@ -114,9 +110,8 @@ Search(const std::string &regex, const std::unordered_map<int, std::unordered_se
 
         StringPiece file(static_cast<char *>(src));
         StringPiece file_begin(static_cast<char *>(src));
-        std::string regex_for_match = "(" + regex + ")";
         re2::StringPiece result;
-        while (re2::RE2::FindAndConsume(&file, regex_for_match, &result)) {
+        while (re2::RE2::FindAndConsume(&file, query.GetRegex(), &result)) {
             search_result.push_back({path, result.data() - file_begin.data()});
         }
     }

@@ -1,3 +1,5 @@
+#pragma once
+
 #include "configs.h"
 
 #include <boost/archive/text_oarchive.hpp>
