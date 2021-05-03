@@ -21,6 +21,14 @@ namespace {
                   << meta.GetUpdateIntervalSec().value << std::endl;
         std::cout << "CNT_FILES_IN_SHARD | " << meta.GetCntFilesInShard().description << " | "
                   << meta.GetCntFilesInShard().value << std::endl;
+        std::cout << "MAX_SIZE_INDEX_FILE | " << meta.GetMaxSizeIndexFile().description << " | "
+                  << meta.GetMaxSizeIndexFile().value << std::endl;
+
+        std::cout << "FILES_FORMATS_IGNORE | " << meta.GetFilesFormatsIgnore().description << " | { ";
+        for (const auto& type: meta.GetFilesFormatsIgnore().value) {
+            std::cout << "\"" << type << "\" ";
+        }
+        std::cout << "}" << std::endl;
     }
 }
 
@@ -39,7 +47,7 @@ int main(int argc, char *argv[]) {
         std::cout << "Wrong format! For update template is 'update *config_name* *value*'\n";
         return 0;
     }
-
+//    TODO add update new configs
     if (action == "update") {
         std::string config_name = argv[2];
         std::string value = argv[3];

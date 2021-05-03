@@ -1,6 +1,7 @@
 #pragma once
 
 #include "regex.h"
+#include "../models/index.h"
 
 #include <string>
 #include <vector>
@@ -12,4 +13,4 @@ struct SearchResult {
     long int offset;
 };
 
-std::vector<SearchResult> Search(const RegexQuery&, const std::unordered_map<int, std::unordered_set<std::string>> &);
+std::vector<SearchResult> Search(const RegexQuery &, const Index &, const Meta&);

@@ -4,44 +4,85 @@
 #include <fstream>
 #include <iostream>
 #include <sys/stat.h>
+#include <optional>
 
 using namespace boost::archive;
 namespace fs = std::experimental::filesystem;
 
+namespace {
+    std::optional<int> GetPathId(const std::string& path, std::vector<std::string>& file_paths) {
+        auto it = std::find(file_paths.begin(), file_paths.end(), path);
+        if (it != file_paths.end()) {
+            return it - file_paths.begin();
+        }
+        return std::nullopt;
+    }
+
+    int GetOrCreatePathId(const std::string& path, std::vector<std::string>& file_paths) {
+        auto cur_path_id = GetPathId(path, file_paths);
+        if (cur_path_id) {
+            return *cur_path_id;
+        }
+
+        auto it = std::find(file_paths.begin(), file_paths.end(), "");
+        if (it != file_paths.end()) {
+            int ind = it - file_paths.begin();
+            file_paths[ind] = path;
+            return ind;
+        }
+        file_paths.push_back(path);
+        return file_paths.size() - 1;
+    }
+}
+
 Meta::Meta() {
-    std::ifstream file{"meta_info.txt"};
+    std::ifstream file{"meta_info.bin"};
     try {
-        text_iarchive ia{file};
+        binary_iarchive ia{file};
         ia >> *this;
     } catch (const std::exception &ex) {}
 }
 
 void Meta::SaveMeta() {
-    std::ofstream file{"meta_info.txt"};
-    text_oarchive oa{file};
+    std::ofstream file{"meta_info.bin"};
+    binary_oarchive oa{file};
     oa << *this;
 }
 
-void Meta::AddFile(const std::string &file) {
+int Meta::AddFile(const std::string &file) {
+    auto path_id = GetOrCreatePathId(file, file_paths);
     struct stat fileInfo;
     stat(file.c_str(), &fileInfo);
-    files[file] = fileInfo.st_mtim.tv_sec;
+    files[path_id] = fileInfo.st_mtim.tv_sec;
+    return path_id;
 }
 
 void Meta::DeleteFile(const std::string &file) {
-    files.erase(file);
+    auto path_id = GetPathId(file, file_paths);
+    if (path_id) {
+        files.erase(*path_id);
+        file_paths[*path_id] = "";
+    }
 }
 
 void Meta::SetUpdateIntervalSec(int new_value) {
-    UPDATE_INTERVAL_SEC.value = new_value;
+    update_interval_sec.value = new_value;
 }
 
 void Meta::SetCntFilesInShard(int new_value) {
-    CNT_FILES_IN_SHARD.value = new_value;
+    cnt_files_in_shard.value = new_value;
+}
+
+void Meta::SetMaxSizeIndexFile(int new_value) {
+    max_size_index_file.value = new_value;
+}
+
+void Meta::SetFilesFormatsIgnore(const std::unordered_set<std::string>& new_value) {
+    files_formats_ignore.value = new_value;
 }
 
 void Meta::Clear() {
-    fs::remove("meta_info.txt");
+    fs::remove("meta_info.bin");
 }
 
 void Meta::StopEngine() {

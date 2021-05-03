@@ -3,10 +3,21 @@
 #include <experimental/filesystem>
 #include <iostream>
 #include <vector>
+#include <unordered_set>
 
 namespace fs = std::experimental::filesystem;
 
 namespace {
+
+    bool isHidden(const fs::path &p) {
+        fs::path::string_type name = p.filename();
+        if (name != ".." &&
+            name != "." &&
+            name[0] == '.') {
+            return true;
+        }
+        return false;
+    }
 
     void Delete(const std::string &file, Meta &meta) {
         if (fs::is_regular_file(file)) {
@@ -21,9 +32,12 @@ namespace {
     }
 
     void Add(const std::string &file, Meta &meta) {
-        if (fs::is_regular_file(file)) {
+        if (fs::is_regular_file(file) && fs::file_size(file) < meta.GetMaxSizeIndexFile().value &&
+            meta.GetFilesFormatsIgnore().value.find(fs::path(file).extension()) ==
+            meta.GetFilesFormatsIgnore().value.end()) {
+            std::cout << fs::path(file) << " ->>>" << fs::path(file).extension() << std::endl;
             meta.AddFile(fs::canonical(file));
-        } else if (fs::is_directory(file)) {
+        } else if (fs::is_directory(file) && !isHidden(file)) {
             for (const auto &entry : fs::directory_iterator(file)) {
                 Add(entry.path(), meta);
             }

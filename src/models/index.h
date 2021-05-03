@@ -1,20 +1,26 @@
 #pragma once
 
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/text_iarchive.hpp>
-#include <boost/archive/detail/common_iarchive.hpp>
-#include <boost/serialization/unordered_set.hpp>
-#include <boost/serialization/unordered_map.hpp>
-#include <unordered_map>
-#include <unordered_set>
+#include "meta.h"
+//#include <boost/archive/text_oarchive.hpp>
+//#include <boost/archive/text_iarchive.hpp>
+//#include <boost/archive/detail/common_iarchive.hpp>
+#include <boost/container/flat_map.hpp>
+#include <boost/container/flat_set.hpp>
+#include "../utils/serialization_unordered_map.h"
+#include "../utils/serialization_unordered_set.h"
 
+
+#include <boost/unordered_map.hpp>
+#include <boost/unordered_set.hpp>
+//using namespace  boost::container;
+using namespace boost::unordered;
 class Index {
 public:
-    void AddFile(const std::string &);
+    void AddFile(int, const Meta&);
 
-    void DeleteFile(const std::string &);
+    void DeleteFile(int);
 
-    const std::unordered_map<int, std::unordered_set<std::string>> &GetIndex() const { return index; }
+    const unordered_map<int, unordered_set<int>> &GetIndex() const { return index; }
 
 private:
     friend class boost::serialization::access;
@@ -24,5 +30,5 @@ private:
         archive & BOOST_SERIALIZATION_NVP(index);
     }
 
-    std::unordered_map<int, std::unordered_set<std::string>> index;
+    unordered_map<int, unordered_set<int>> index;
 };
