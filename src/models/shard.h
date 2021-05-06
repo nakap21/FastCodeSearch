@@ -2,7 +2,7 @@
 
 #include "index.h"
 #include "meta.h"
-#include "../utils/serialization_unordered_map.h"
+//#include "../utils/serialization_unordered_map.h"
 
 //#include <boost/archive/text_oarchive.hpp>
 //#include <boost/archive/text_iarchive.hpp>
@@ -20,6 +20,8 @@
 //using namespace  boost::container;
 using namespace boost::unordered;
 
+size_t LoadCntIndexes(const std::string& file_path = "cnt_indexes.bin");
+
 class Shards {
 public:
     void AddFile(int, const Meta &);
@@ -28,7 +30,7 @@ public:
 
     void SaveShards();
 
-    void LoadShards();
+    std::vector<Index::IndexForSearch> LoadShards();
 
     void Clear();
 
@@ -47,6 +49,8 @@ private:
         archive & BOOST_SERIALIZATION_NVP(files_shard);
         archive & BOOST_SERIALIZATION_NVP(files_cnt_on_shrads);
     }
+
+    void SaveCntIndexes();
 
     unordered_map<int, int> files_shard;
     std::vector<int> files_cnt_on_shrads;

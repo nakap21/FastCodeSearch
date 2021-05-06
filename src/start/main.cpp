@@ -8,21 +8,12 @@
 
 #include <iostream>
 
-#include <boost/archive/binary_oarchive.hpp>
-#include <boost/archive/binary_iarchive.hpp>
-#include <boost/archive/detail/common_iarchive.hpp>
-#include <boost/serialization/vector.hpp>
-#include <boost/serialization/boost_unordered_set.hpp>
-#include <boost/serialization/boost_unordered_map.hpp>
-#include <boost/serialization/unordered_set.hpp>
-#include <boost/container/flat_map.hpp>
-#include <boost/container/flat_set.hpp>
-#include <fstream>
 #include <time.h>
-
+#include <absl/container/flat_hash_map.h>
+#include <absl/container/flat_hash_set.h>
 #include <boost/unordered_map.hpp>
 
-//#include "test.pb.h"
+
 using namespace boost::archive;
 
 namespace {
@@ -50,6 +41,7 @@ namespace {
         meta.SetUpdateIntervalSec(cur_meta.GetUpdateIntervalSec().value);
         meta.SetCntFilesInShard(cur_meta.GetCntFilesInShard().value);
         meta.SaveMeta();
+        meta.SaveFilePathsById();
     }
 
     bool ShouldUpdateIndex(const Meta &meta) {
@@ -77,7 +69,6 @@ namespace {
             files_to_add.insert(cur_meta.GetPathById(file.first));
         }
         Meta saved_meta = meta;
-//        files_in_meta = meta.GetFiles();
         for (const auto &file: saved_meta.GetFiles()) {
             auto &file_path = saved_meta.GetPathById(file.first);
             auto it = std::find(cur_meta.GetPaths().begin(), cur_meta.GetPaths().end(), file_path);
@@ -108,66 +99,12 @@ namespace {
         }
         shards.SaveShards();
         meta.SaveMeta();
+        meta.SaveFilePathsById();
     }
-}
-
-struct Test {
-//    boost::unordered::unordered_map<int, boost::unordered::unordered_set<int>> val;
-    std::unordered_map<int, std::unordered_set<int>> val;
-//    boost::container::flat_map<int, boost::container::flat_set<int>> val;
-private:
-    friend class boost::serialization::access;
-
-    template<class Archive>
-    void serialize(Archive &archive, const unsigned int version) {
-        archive & BOOST_SERIALIZATION_NVP(val);
-    }
-};
-
-void SaveT(const Test &test) {
-    std::ofstream file{"test.bin"};
-    binary_oarchive oa{file};
-    oa << test;
-}
-
-void LoadT() {
-    clock_t start = clock();
-    std::ifstream file{"test.bin"};
-    clock_t end = clock();
-    double seconds = (double) (end - start) / CLOCKS_PER_SEC;
-    std::cout << "HER1 " << seconds << std::endl;
-    binary_iarchive ia{file};
-    Test a;
-    clock_t end2 = clock();
-    double seconds2 = (double) (end2 - start) / CLOCKS_PER_SEC;
-    std::cout << "HER2 " << seconds2 << std::endl;
-    ia >> a;
-    clock_t end3 = clock();
-    double seconds3 = (double) (end3 - start) / CLOCKS_PER_SEC;
-    std::cout << "HER3 " << seconds3 << std::endl;
 }
 
 int main() {
-//    Test a;
-//    clock_t start = clock();
-//    std::cout << "NOW " << std::endl;
-//    for (int i = 0; i < 10000; ++i) {
-//        for (int j = 0; j < 100; ++j) {
-//            a.val[i].insert(j);
-//        }
-//    }
-//    clock_t end = clock();
-//    double seconds = (double) (end - start) / CLOCKS_PER_SEC;
-//    std::cout << "MAke data " << seconds << std::endl;
-//    std::cout << "NOW2 " << std::endl;
-//    SaveT(a);
-//    std::cout << "NOW3 " << std::endl;
-//
-//    LoadT();
-
-
-
-            Meta meta;
+    Meta meta;
     auto shards = CreateIndex(meta);
     while (!meta.ShouldStopEngine()) {
         std::cout << "GO AGAIN\n";

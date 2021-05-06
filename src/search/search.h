@@ -13,4 +13,5 @@ struct SearchResult {
     long int offset;
 };
 
-std::vector<SearchResult> Search(const RegexQuery &, const Index &, const Meta&);
+std::vector<std::vector<SearchResult>>
+Search(const RegexQuery &, const std::vector<Index::IndexForSearch> &, const std::vector<std::string> &);

@@ -20,7 +20,7 @@ private:
 
 struct CntFilesInShard {
     std::string description = "Count of files per shard";
-    int value = 30; // TODO fix default value
+    int value = 200; // TODO fix default value
 private:
     friend class boost::serialization::access;
 
@@ -33,7 +33,7 @@ private:
 
 struct MaxSizeIndexFile {
     std::string description = "Max size files in index";
-    int value = 20971520; // TODO fix default value
+    int value = 15971520; // TODO fix default value
 private:
     friend class boost::serialization::access;
 

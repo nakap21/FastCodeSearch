@@ -35,8 +35,8 @@ namespace {
     }
 }
 
-Meta::Meta() {
-    std::ifstream file{"meta_info.bin"};
+Meta::Meta(const std::string& file_path) {
+    std::ifstream file{file_path};
     try {
         binary_iarchive ia{file};
         ia >> *this;
@@ -83,8 +83,23 @@ void Meta::SetFilesFormatsIgnore(const std::unordered_set<std::string>& new_valu
 
 void Meta::Clear() {
     fs::remove("meta_info.bin");
+    fs::remove("files_path_by_id.bin");
 }
 
 void Meta::StopEngine() {
     should_stop_engine = true;
+}
+
+void Meta::SaveFilePathsById() {
+    std::ofstream file{"files_path_by_id.bin"};
+    binary_oarchive oa{file};
+    oa << file_paths;
+}
+
+std::vector<std::string> LoadFilePathsById(const std::string& file_path) {
+    std::ifstream file{file_path};
+    binary_iarchive ia{file};
+    std::vector<std::string> file_paths_by_id;
+    ia >> file_paths_by_id;
+    return file_paths_by_id;
 }

@@ -4,6 +4,7 @@
 #include <re2/prefilter_tree.h>
 #include <re2/prefilter.h>
 #include <iostream>
+#include <memory>
 
 using namespace re2;
 
@@ -19,8 +20,8 @@ RegexQuery::RegexQuery(const std::string &regex) {
         return;
     }
     regex_for_match = "(" + regex + ")";
-    RE2 re(regex_for_match);
-    Prefilter *pf = re2::Prefilter::FromRE2(&re);
+    std::shared_ptr<RE2> re = std::make_shared<RE2>(regex_for_match);
+    std::unique_ptr<Prefilter> pf(re2::Prefilter::FromRE2(re.get()));
     if (pf == NULL) {
         std::cout << "ERROR! Wrong regular expression!\n";
         operation = kNone;
@@ -45,7 +46,7 @@ RegexQuery::RegexQuery(const std::string &regex) {
         return;
     }
     PrefilterTree tree;
-    tree.Add(pf);
+    tree.Add(pf.get());
     tree.Compile(&subs);
     operation = kOr;
     if (subs.empty()) {

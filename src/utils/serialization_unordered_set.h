@@ -1,6 +1,5 @@
 #pragma once
 
-
 #include <boost/unordered_set.hpp>
 #include <boost/serialization/set.hpp>
 

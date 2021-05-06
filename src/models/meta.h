@@ -17,9 +17,10 @@
 #include <boost/unordered_map.hpp>
 //using namespace  boost::container;
 using namespace boost::unordered;
+
 class Meta {
 public:
-    Meta();
+    Meta(const std::string &file_path = "meta_info.bin");
 
     void SaveMeta();
 
@@ -27,7 +28,7 @@ public:
 
     void SetCntFilesInShard(int);
 
-    void SetFilesFormatsIgnore(const std::unordered_set<std::string>&);
+    void SetFilesFormatsIgnore(const std::unordered_set<std::string> &);
 
     void SetMaxSizeIndexFile(int);
 
@@ -53,7 +54,9 @@ public:
 
     const std::string &GetPathById(int ind) const { return file_paths[ind]; }
 
-    const std::vector<std::string>& GetPaths() const { return file_paths; }
+    const std::vector<std::string> &GetPaths() const { return file_paths; }
+
+    void SaveFilePathsById();
 
 private:
     friend class boost::serialization::access;
