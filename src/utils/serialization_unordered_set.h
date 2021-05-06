@@ -15,14 +15,14 @@ namespace boost {
         template <class Archive, class... Types>
         inline void load(Archive& ar, boost::unordered_set<Types...>& t, const unsigned int /* file_version */
         ) {
-#if BOOST_VERSION >= 105800
+//#if BOOST_VERSION >= 105800
             load_set_collection(ar, t);
-#else
-            boost::serialization::stl::load_collection<
-        Archive, boost::container::flat_set<Types...>,
-        boost::serialization::stl::archive_input_set<Archive, boost::container::flat_set<Types...>>,
-        boost::serialization::stl::reserve_imp<boost::container::flat_set<Types...>>>(ar, t);
-#endif
+//#else
+//            boost::serialization::stl::load_collection<
+//        Archive, boost::container::flat_set<Types...>,
+//        boost::serialization::stl::archive_input_set<Archive, boost::container::flat_set<Types...>>,
+//        boost::serialization::stl::reserve_imp<boost::container::flat_set<Types...>>>(ar, t);
+//#endif
         }
 
 // split non-intrusive serialization function member into separate

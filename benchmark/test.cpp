@@ -6,7 +6,6 @@
 #include "../src/models/shard.h"
 
 #include <vector>
-#include <iostream>
 
 static void BM_SomeFunction(benchmark::State &state) {
     // Perform setup here
@@ -14,11 +13,11 @@ static void BM_SomeFunction(benchmark::State &state) {
     for (auto _ : state) {
         // This code gets timed
         RegexQuery query("integ");
-        auto file_paths_by_id = LoadFilePathsById("/home/nakap/diploma/FastCodeSearch/benchmark/static/files_path_by_id.bin");
-        auto cnt_indexes = LoadCntIndexes("/home/nakap/diploma/FastCodeSearch/benchmark/static/cnt_indexes.bin");
+        auto file_paths_by_id = LoadFilePathsById("static/files_path_by_id.bin");
+        auto cnt_indexes = LoadCntIndexes("static/cnt_indexes.bin");
 
         std::vector<Index::IndexForSearch> indexes = LoadIndexes(cnt_indexes,
-                                                                 "/home/nakap/diploma/FastCodeSearch/benchmark/static/");
+                                                                 "static/");
         Search(query, indexes, file_paths_by_id);
     }
 }

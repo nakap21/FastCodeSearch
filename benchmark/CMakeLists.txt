@@ -4,23 +4,21 @@ FetchContent_Declare(googlebenchmark
         )
 FetchContent_MakeAvailable(googlebenchmark)
 
-#find_package(benchmark REQUIRED)
+
 
 add_executable(
-        benchmark_tes
+        search_benchmark
         test.cpp
         ../src/search/regex.cpp
         ../src/search/search.cpp
         ../src/models/meta.cpp
         ../src/models/index.cpp
         ../src/models/shard.cpp
-
 )
 target_link_libraries(
-        benchmark_tes
+        search_benchmark
         benchmark::benchmark
         benchmark::benchmark_main
 )
 
-#include(GoogleTest)
-#gtest_discover_tests(hello_test)
+file(COPY static DESTINATION ${CMAKE_CURRENT_BINARY_DIR})

@@ -3,17 +3,9 @@
 #include <experimental/filesystem>
 #include <fstream>
 
-#include <iostream>
-#include <time.h>
-
-#include <future>
 using namespace boost::archive;
+
 namespace fs = std::experimental::filesystem;
-
-namespace {
-
-
-}
 
 void Shards::AddFile(int file_id, const Meta &meta) {
     if (files_shard.find(file_id) != files_shard.end()) {
@@ -54,51 +46,45 @@ void Shards::DeleteFile(int file_id) {
 }
 
 void Shards::SaveCntIndexes() {
-    std::ofstream file{"cnt_indexes.bin"};
-    binary_oarchive oa{file};
-    oa << files_cnt_on_shrads.size();
+    try {
+        std::ofstream file{"cnt_indexes.bin"};
+        binary_oarchive oa{file};
+        oa << files_cnt_on_shrads.size();
+    } catch (const std::exception &ex) {
+        auto err = std::string(ex.what());
+        throw std::runtime_error("Can't save cnt_indexes: " + err);
+    }
 }
 
-size_t LoadCntIndexes(const std::string& file_path) {
-    std::ifstream file{file_path};
-    binary_iarchive ia{file};
-    size_t cnt;
-    ia >> cnt;
-    return cnt;
+size_t LoadCntIndexes(const std::string &file_path) {
+    try {
+        std::ifstream file{file_path};
+        binary_iarchive ia{file};
+        size_t cnt;
+        ia >> cnt;
+        return cnt;
+    } catch (const std::exception &ex) {
+        auto err = std::string(ex.what());
+        throw std::runtime_error("Can't load file " + file_path + ": " + err);
+    }
+}
+
+void Shards::Clear() {
+    for (size_t i = 0; i < files_cnt_on_shrads.size(); ++i) {
+        auto index_file_name = GetIndexFileName(i);
+        DeleteIndex(index_file_name);
+    }
+    files_cnt_on_shrads.clear();
+    files_shard.clear();
+    try {
+        fs::remove("cnt_indexes.bin");
+    } catch (const std::exception &ex) {
+        auto err = std::string(ex.what());
+        throw std::runtime_error("Can't remove file: " + err);
+    }
 }
 
 void Shards::SaveShards() {
     SaveCntIndexes();
     SaveIndexes(indexes);
-}
-
-//std::vector<Index::IndexForSearch> Shards::LoadShards() {
-////    std::cout << "KE0\n";
-//    std::ifstream file{"shards.bin"};
-//    binary_iarchive ia{file};
-//    ia >> *this;
-////    std::cout << "KEK1\n";
-//    clock_t start = clock();
-//    std::vector<std::future<Index::IndexForSearch>> fut_index;
-//    for (size_t i = 0; i < files_cnt_on_shrads.size(); ++i) {
-//        fut_index.push_back(std::async(std::launch::async, [i]{ return LoadIndex(GetIndexFileName(i)); }));
-//    }
-//    std::vector<Index::IndexForSearch> result;
-//    for (size_t i = 0; i < files_cnt_on_shrads.size(); ++i) {
-//        result.push_back(fut_index[i].get());
-//    }
-//    clock_t end = clock();
-//    double seconds = (double)(end - start) / CLOCKS_PER_SEC;
-//    std::cout << "Load Indexes " << seconds << std::endl;
-//    return result;
-//}
-
-void Shards::Clear() {
-    for (size_t i = 0; i < files_cnt_on_shrads.size(); ++i) {
-        auto index_file_name = GetIndexFileName(i);
-        fs::remove(index_file_name);
-    }
-    files_cnt_on_shrads.clear();
-    files_shard.clear();
-    fs::remove("shards.bin");
 }

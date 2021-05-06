@@ -1,19 +1,15 @@
 #include "search.h"
 
+#include <boost/container/flat_set.hpp>
+#include <boost/unordered_map.hpp>
+#include <boost/unordered_set.hpp>
 #include <fcntl.h>
+#include <future>
+#include <iostream>
 #include <re2/re2.h>
 #include <re2/stringpiece.h>
 #include <sys/stat.h>
 #include <sys/mman.h>
-
-#include <iostream>
-
-#include <boost/container/flat_set.hpp>
-#include <boost/unordered_map.hpp>
-#include <boost/unordered_set.hpp>
-
-#include <experimental/filesystem>
-#include <future>
 
 using namespace boost::unordered;
 
@@ -22,9 +18,9 @@ using namespace re2;
 namespace {
 
     std::vector<int>
-    GetFilesWithTr(int tr, const Index::IndexForSearch &index, const boost::unordered_map<int, int> &mapka) {
-        auto it = mapka.find(tr);
-        if (it == mapka.end()) {
+    GetFilesWithTr(int tr, const Index::IndexForSearch &index, const boost::unordered_map<int, int> &trigram_map) {
+        auto it = trigram_map.find(tr);
+        if (it == trigram_map.end()) {
             return {};
         }
         return index.files_ids[it->second];
@@ -81,16 +77,17 @@ namespace {
     }
 
     std::vector<int> AndTrigrams(const std::vector<int> &trigrams,
-                                 const Index::IndexForSearch &index, const boost::unordered_map<int, int> &mapka) {
+                                 const Index::IndexForSearch &index,
+                                 const boost::unordered_map<int, int> &trigram_map) {
         if (trigrams.empty()) {
             return {};
         }
-        auto result = GetFilesWithTr(trigrams[0], index, mapka);
+        auto result = GetFilesWithTr(trigrams[0], index, trigram_map);
 
         for (size_t i = 1; i < trigrams.size(); ++i) {
             std::vector<int> to_del;
             for (const auto &cur: result) {
-                auto cur_files = GetFilesWithTr(trigrams[i], index, mapka);
+                auto cur_files = GetFilesWithTr(trigrams[i], index, trigram_map);
                 auto and_res = AndTwoVectors(result, cur_files);
                 result = std::move(and_res);
             }
@@ -126,7 +123,7 @@ namespace {
 
     std::vector<int>
     GetFilesToSearch(const RegexQuery &query, const Index::IndexForSearch &index,
-                     const boost::unordered_map<int, int> &mapka) {
+                     const boost::unordered_map<int, int> &trigram_map) {
         if (query.GetOperation() == RegexQuery::kAll) {
             return GetAllFiles(index);
         }
@@ -137,7 +134,7 @@ namespace {
                 return GetAllFiles(index);
             }
             auto trigrams = GetTrigrams(regex);
-            auto files_for_trigrams = AndTrigrams(trigrams, index, mapka);
+            auto files_for_trigrams = AndTrigrams(trigrams, index, trigram_map);
             files = OrTwoVectors(files, files_for_trigrams);
         }
         return files;
@@ -145,9 +142,10 @@ namespace {
 
 }
 
-boost::unordered_map<int, int> GetMap(const Index::IndexForSearch &index, const boost::unordered_set<int> &all_tr) {
+boost::unordered_map<int, int>
+GetTrigramMap(const Index::IndexForSearch &index, const boost::unordered_set<int> &all_trigrams) {
     boost::unordered_map<int, int> result;
-    for (const auto &tr: all_tr) {
+    for (const auto &tr: all_trigrams) {
         auto upper = std::upper_bound(index.trigrams.begin(), index.trigrams.end(), tr);
         if (upper == index.trigrams.begin()) { ;
         } else {
@@ -206,8 +204,8 @@ SearchInIndex(const RegexQuery &query, const Index::IndexForSearch &index,
               const std::vector<std::string> &file_paths_by_id) {
     std::vector<SearchResult> search_result;
     auto all_trigrams = GetAllTrigrams(query);
-    auto mapka = GetMap(index, all_trigrams);
-    auto files_to_search = GetFilesToSearch(query, index, mapka);
+    auto trigram_map = GetTrigramMap(index, all_trigrams);
+    auto files_to_search = GetFilesToSearch(query, index, trigram_map);
     std::vector<std::future<std::vector<SearchResult>>> file_search_future_result;
     for (const auto &path_id: files_to_search) {
         auto search_in_file = SearchInFile(path_id, query, file_paths_by_id);

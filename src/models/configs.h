@@ -1,9 +1,13 @@
 #pragma once
 
+#include "../../utils/serialization_unordered_set.h"
+
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
 #include <boost/archive/detail/common_iarchive.hpp>
-#include <boost/serialization/unordered_set.hpp>
+#include <boost/unordered_set.hpp>
+
+using namespace  boost::unordered;
 
 struct UpdateIntervalSec {
     std::string description = "Index update interval in seconds";
@@ -46,7 +50,7 @@ private:
 
 struct FilesFormatsIgnore {
     std::string description = "Max size files in index";
-    std::unordered_set<std::string> value = {".tsv", ".gitignore", ".tsv", ".csv", ".reference", ".png",
+    unordered_set<std::string> value = {".tsv", ".gitignore", ".tsv", ".csv", ".reference", ".png",
                                              ".pdf", ".git", ".gif", ".svg"}; // TODO fix default value
 private:
     friend class boost::serialization::access;

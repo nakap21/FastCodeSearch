@@ -15,11 +15,11 @@ namespace {
 }
 
 RegexQuery::RegexQuery(const std::string &regex) {
+    regex_for_match = "(" + regex + ")";
     if (IsSmallRegex(regex)) {
         operation = kAll;
         return;
     }
-    regex_for_match = "(" + regex + ")";
     std::shared_ptr<RE2> re = std::make_shared<RE2>(regex_for_match);
     std::unique_ptr<Prefilter> pf(re2::Prefilter::FromRE2(re.get()));
     if (pf == NULL) {

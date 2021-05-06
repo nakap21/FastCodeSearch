@@ -8,12 +8,6 @@
 
 #include <iostream>
 
-#include <time.h>
-#include <absl/container/flat_hash_map.h>
-#include <absl/container/flat_hash_set.h>
-#include <boost/unordered_map.hpp>
-
-
 using namespace boost::archive;
 
 namespace {
@@ -64,7 +58,6 @@ namespace {
     void UpdateIndex(Shards &shards, Meta &meta) {
         Meta cur_meta;
         std::unordered_set<std::string> files_to_add;
-        std::cout << "SIZE NEW FILES = " << cur_meta.GetFiles().size() << "\n";
         for (const auto &file: cur_meta.GetFiles()) {
             files_to_add.insert(cur_meta.GetPathById(file.first));
         }
@@ -89,13 +82,11 @@ namespace {
             }
         }
         for (const auto &file: files_to_add) {
-            std::cout << "add file " << file << "\n";
             auto new_path_id = meta.AddFile(file);
             clock_t start = clock();
             shards.AddFile(new_path_id, meta);
             clock_t end = clock();
             double seconds = (double) (end - start) / CLOCKS_PER_SEC;
-            std::cout << "added file " << seconds << std::endl;
         }
         shards.SaveShards();
         meta.SaveMeta();
@@ -104,28 +95,26 @@ namespace {
 }
 
 int main() {
-    Meta meta;
-    auto shards = CreateIndex(meta);
-    while (!meta.ShouldStopEngine()) {
-        std::cout << "GO AGAIN\n";
-        if (ShouldUpdateMeta(meta)) {
-            std::cout << "Update Meta\n";
-            UpdateMeta(meta);
-            std::cout << "FINISHED Update Meta\n";
-            shards.Clear();
-            shards = CreateIndex(meta);
+    try {
+        Meta meta;
+        auto shards = CreateIndex(meta);
+        while (!meta.ShouldStopEngine()) {
+            if (ShouldUpdateMeta(meta)) {
+                UpdateMeta(meta);
+                shards.Clear();
+                shards = CreateIndex(meta);
+            }
+            if (ShouldUpdateIndex(meta)) {
+                clock_t start = clock();
+                UpdateIndex(shards, meta);
+                clock_t end = clock();
+                double seconds = (double) (end - start) / CLOCKS_PER_SEC;
+            }
+            std::this_thread::sleep_for(std::chrono::seconds(meta.GetUpdateIntervalSec().value));
         }
-        if (ShouldUpdateIndex(meta)) {
-            std::cout << "Update INDEX\n";
-            clock_t start = clock();
-            UpdateIndex(shards, meta);
-            clock_t end = clock();
-            double seconds = (double) (end - start) / CLOCKS_PER_SEC;
-            std::cout << "FINISHED Update INDEX " << seconds << "\n";
-        }
-        std::cout << "SLEEP\n";
-        std::this_thread::sleep_for(std::chrono::seconds(meta.GetUpdateIntervalSec().value));
+        shards.Clear();
+        meta.Clear();
+    } catch (const std::exception &ex) {
+        std::cout << ex.what() << std::endl;
     }
-    shards.Clear();
-    meta.Clear();
 }

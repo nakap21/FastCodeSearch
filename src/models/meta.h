@@ -3,19 +3,13 @@
 #include "configs.h"
 #include "../utils/serialization_unordered_map.h"
 
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/text_iarchive.hpp>
 #include <boost/archive/binary_oarchive.hpp>
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/archive/detail/common_iarchive.hpp>
-#include <boost/serialization/unordered_map.hpp>
 #include <boost/serialization/vector.hpp>
-#include <unordered_set>
-#include <boost/container/flat_map.hpp>
-#include <boost/container/flat_set.hpp>
-
 #include <boost/unordered_map.hpp>
-//using namespace  boost::container;
+#include <boost/unordered_set.hpp>
+
 using namespace boost::unordered;
 
 class Meta {
@@ -28,7 +22,7 @@ public:
 
     void SetCntFilesInShard(int);
 
-    void SetFilesFormatsIgnore(const std::unordered_set<std::string> &);
+    void SetFilesFormatsIgnore(const unordered_set<std::string> &);
 
     void SetMaxSizeIndexFile(int);
 

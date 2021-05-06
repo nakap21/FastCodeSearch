@@ -1,15 +1,12 @@
 # pragma once
 
-#include <boost/unordered_map.hpp>
-
 #include <boost/config.hpp>
-
 #include <boost/serialization/utility.hpp>
 #include <boost/serialization/collections_save_imp.hpp>
 #include <boost/serialization/collections_load_imp.hpp>
 #include <boost/serialization/split_free.hpp>
 #include <boost/serialization/map.hpp>
-
+#include <boost/unordered_map.hpp>
 
 namespace boost {
     namespace serialization {
@@ -32,14 +29,14 @@ namespace boost {
                 boost::unordered_map<Key, Type, Hash, Compare, Allocator> &t,
                 const unsigned int /* file_version */
         ){
-#if BOOST_VERSION >= 105800
+//#if BOOST_VERSION >= 105800
             load_map_collection(ar, t);
-#else
-            boost::serialization::stl::load_collection<
-        Archive, boost::unordered_map<Key, Type, Hash, Compare, Allocator>,
-        boost::serialization::stl::archive_input_map<Archive, boost::unordered_map<Key, Type, Hash, Compare, Allocator>>,
-        boost::serialization::stl::reserve_imp<boost::boost::unordered_map<Key, Type, Hash, Compare, Allocator>>>(ar, t);
-#endif
+//#else
+//            boost::serialization::stl::load_collection<
+//        Archive, boost::unordered_map<Key, Type, Hash, Compare, Allocator>,
+//        boost::serialization::stl::archive_input_map<Archive, boost::unordered_map<Key, Type, Hash, Compare, Allocator>>,
+//        boost::serialization::stl::reserve_imp<boost::boost::unordered_map<Key, Type, Hash, Compare, Allocator>>>(ar, t);
+//#endif
         }
 
 // split non-intrusive serialization function member into separate
