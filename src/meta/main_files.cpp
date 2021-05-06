@@ -1,11 +1,11 @@
 #include "../models/meta.h"
 
-#include <experimental/filesystem>
+#include <filesystem>
 #include <iostream>
 #include <vector>
 #include <unordered_set>
 
-namespace fs = std::experimental::filesystem;
+namespace fs = std::filesystem;
 
 namespace {
 
@@ -31,10 +31,14 @@ namespace {
         }
     }
 
+    bool IsNeededToAdd(const std::string &file, Meta &meta) {
+        return fs::file_size(file) < meta.GetMaxSizeIndexFile().value &&
+               meta.GetFilesFormatsIgnore().value.find(fs::path(file).extension()) ==
+               meta.GetFilesFormatsIgnore().value.end();
+    }
+
     void Add(const std::string &file, Meta &meta) {
-        if (fs::is_regular_file(file) && fs::file_size(file) < meta.GetMaxSizeIndexFile().value &&
-            meta.GetFilesFormatsIgnore().value.find(fs::path(file).extension()) ==
-            meta.GetFilesFormatsIgnore().value.end()) {
+        if (fs::is_regular_file(file) && IsNeededToAdd(file, meta)) {
             std::cout << fs::path(file) << " ->>>" << fs::path(file).extension() << std::endl;
             meta.AddFile(fs::canonical(file));
         } else if (fs::is_directory(file) && !isHidden(file)) {
