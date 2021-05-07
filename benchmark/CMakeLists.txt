@@ -4,8 +4,6 @@ FetchContent_Declare(googlebenchmark
         )
 FetchContent_MakeAvailable(googlebenchmark)
 
-
-
 add_executable(
         search_benchmark
         test.cpp
@@ -15,6 +13,7 @@ add_executable(
         ../src/models/index.cpp
         ../src/models/shard.cpp
 )
+
 target_link_libraries(
         search_benchmark
         benchmark::benchmark
