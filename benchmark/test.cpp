@@ -12,7 +12,7 @@ static void BM_SomeFunction(benchmark::State &state) {
 
     for (auto _ : state) {
         // This code gets timed
-        RegexQuery query("integ");
+        RegexQuery query("in");
         auto file_paths_by_id = LoadFilePathsById("static/files_path_by_id.bin");
         auto cnt_indexes = LoadCntIndexes("static/cnt_indexes.bin");
 

@@ -20,9 +20,9 @@ RegexQuery::RegexQuery(const std::string &regex) {
         operation = kAll;
         return;
     }
-    std::shared_ptr<RE2> re = std::make_shared<RE2>(regex_for_match);
+    std::unique_ptr<RE2> re = std::make_unique<RE2>(regex_for_match);
     std::unique_ptr<Prefilter> pf(re2::Prefilter::FromRE2(re.get()));
-    if (pf == NULL) {
+    if (!pf.get()) {
         std::cout << "ERROR! Wrong regular expression!\n";
         operation = kNone;
         return;
@@ -46,7 +46,7 @@ RegexQuery::RegexQuery(const std::string &regex) {
         return;
     }
     PrefilterTree tree;
-    tree.Add(pf.get());
+    tree.Add(pf.release());
     tree.Compile(&subs);
     operation = kOr;
     if (subs.empty()) {

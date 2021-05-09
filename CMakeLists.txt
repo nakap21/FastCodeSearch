@@ -22,8 +22,8 @@ find_package(Threads REQUIRED)
 target_link_libraries(models
         proto
         ${PROTOBUF_LIBRARIES}
-        absl::base
-        absl::flat_hash_map
+#        absl::base
+#        absl::flat_hash_map
         Boost::boost
         Boost::serialization
         ${CMAKE_THREAD_LIBS_INIT}
@@ -46,3 +46,5 @@ set_target_properties(start stop search configs files models
         LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/build"
         RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/build"
         )
+
+
