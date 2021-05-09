@@ -22,8 +22,8 @@ find_package(Threads REQUIRED)
 target_link_libraries(models
         proto
         ${PROTOBUF_LIBRARIES}
-#        absl::base
-#        absl::flat_hash_map
+        absl::base
+        absl::flat_hash_map
         Boost::boost
         Boost::serialization
         ${CMAKE_THREAD_LIBS_INIT}
