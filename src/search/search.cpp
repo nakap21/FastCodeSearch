@@ -1,8 +1,8 @@
 #include "search.h"
 
+#include <absl/container/flat_hash_map.h>
+#include <absl/container/flat_hash_set.h>
 #include <boost/container/flat_set.hpp>
-#include <boost/unordered_map.hpp>
-#include <boost/unordered_set.hpp>
 #include <fcntl.h>
 #include <future>
 #include <iostream>
@@ -11,14 +11,28 @@
 #include <sys/stat.h>
 #include <sys/mman.h>
 
-using namespace boost::unordered;
-
 using namespace re2;
 
 namespace {
 
+    absl::flat_hash_map<int, int>
+    GetTrigramMap(const Index::IndexForSearch &index, const absl::flat_hash_set<int> &all_trigrams) {
+        absl::flat_hash_map<int, int> result;
+        for (const auto &tr: all_trigrams) {
+            auto upper = std::upper_bound(index.trigrams.begin(), index.trigrams.end(), tr);
+            if (upper == index.trigrams.begin()) { ;
+            } else {
+                upper--;
+                if (*upper == tr) {
+                    result.insert({tr, upper - index.trigrams.begin()});
+                }
+            }
+        }
+        return result;
+    }
+
     std::vector<int>
-    GetFilesWithTr(int tr, const Index::IndexForSearch &index, const boost::unordered_map<int, int> &trigram_map) {
+    GetFilesWithTr(int tr, const Index::IndexForSearch &index, const absl::flat_hash_map<int, int> &trigram_map) {
         auto it = trigram_map.find(tr);
         if (it == trigram_map.end()) {
             return {};
@@ -78,7 +92,7 @@ namespace {
 
     std::vector<int> AndTrigrams(const std::vector<int> &trigrams,
                                  const Index::IndexForSearch &index,
-                                 const boost::unordered_map<int, int> &trigram_map) {
+                                 const absl::flat_hash_map<int, int> &trigram_map) {
         if (trigrams.empty()) {
             return {};
         }
@@ -123,7 +137,7 @@ namespace {
 
     std::vector<int>
     GetFilesToSearch(const RegexQuery &query, const Index::IndexForSearch &index,
-                     const boost::unordered_map<int, int> &trigram_map) {
+                     const absl::flat_hash_map<int, int> &trigram_map) {
         if (query.GetOperation() == RegexQuery::kAll) {
             return GetAllFiles(index);
         }
@@ -142,24 +156,8 @@ namespace {
 
 }
 
-boost::unordered_map<int, int>
-GetTrigramMap(const Index::IndexForSearch &index, const boost::unordered_set<int> &all_trigrams) {
-    boost::unordered_map<int, int> result;
-    for (const auto &tr: all_trigrams) {
-        auto upper = std::upper_bound(index.trigrams.begin(), index.trigrams.end(), tr);
-        if (upper == index.trigrams.begin()) { ;
-        } else {
-            upper--;
-            if (*upper == tr) {
-                result.insert({tr, upper - index.trigrams.begin()});
-            }
-        }
-    }
-    return result;
-}
-
-boost::unordered_set<int> GetAllTrigrams(const RegexQuery &query) {
-    boost::unordered_set<int> result;
+absl::flat_hash_set<int> GetAllTrigrams(const RegexQuery &query) {
+    absl::flat_hash_set<int> result;
     for (const auto &sub: query.GetSubs()) {
         for (const auto &tr: GetTrigrams(sub)) {
             result.insert(tr);

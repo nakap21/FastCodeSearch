@@ -9,15 +9,17 @@
 
 static void BM_SomeFunction(benchmark::State &state) {
     // Perform setup here
+    RegexQuery query("int");
+    auto file_paths_by_id = LoadFilePathsById("static/files_path_by_id.bin");
+    auto cnt_indexes = LoadCntIndexes("static/cnt_indexes.bin");
 
+    std::vector<Index::IndexForSearch> indexes = LoadIndexes(cnt_indexes,
+                                                             "static/");
     for (auto _ : state) {
         // This code gets timed
-        RegexQuery query("in");
-        auto file_paths_by_id = LoadFilePathsById("static/files_path_by_id.bin");
-        auto cnt_indexes = LoadCntIndexes("static/cnt_indexes.bin");
 
-        std::vector<Index::IndexForSearch> indexes = LoadIndexes(cnt_indexes,
-                                                                 "static/");
+
+
         Search(query, indexes, file_paths_by_id);
     }
 }
