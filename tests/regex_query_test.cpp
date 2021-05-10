@@ -10,10 +10,13 @@ struct QueryTest {
     std::string exp_regex_for_match;
 };
 
-std::vector<QueryTest> params = {
+static std::vector<QueryTest> params = {
         {"Abcdef",       RegexQuery::kOr,  std::unordered_set<std::string>{"abcdef"},           "(Abcdef)"},
         {"b",            RegexQuery::kAll, std::unordered_set<std::string>{},                   "(b)"},
         {"abc(def|ghi)", RegexQuery::kOr,  std::unordered_set<std::string>{"abcdef", "abcghi"}, "(abc(def|ghi))"},
+        {"(bbb)a*",      RegexQuery::kOr,  std::unordered_set<std::string>{"bbb"},              "((bbb)a*)"},
+        {"[ab][cd][ef]", RegexQuery::kOr,  std::unordered_set<std::string>{"bdf", "bde", "bcf", "bce", "adf", "ade",
+                                                                           "acf", "ace",},      "([ab][cd][ef])"},
 };
 
 

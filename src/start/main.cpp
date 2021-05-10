@@ -83,10 +83,7 @@ namespace {
         }
         for (const auto &file: files_to_add) {
             auto new_path_id = meta.AddFile(file);
-            clock_t start = clock();
             shards.AddFile(new_path_id, meta);
-            clock_t end = clock();
-            double seconds = (double) (end - start) / CLOCKS_PER_SEC;
         }
         shards.SaveShards();
         meta.SaveMeta();
@@ -105,10 +102,7 @@ int main() {
                 shards = CreateIndex(meta);
             }
             if (ShouldUpdateIndex(meta)) {
-                clock_t start = clock();
                 UpdateIndex(shards, meta);
-                clock_t end = clock();
-                double seconds = (double) (end - start) / CLOCKS_PER_SEC;
             }
             std::this_thread::sleep_for(std::chrono::seconds(meta.GetUpdateIntervalSec().value));
         }

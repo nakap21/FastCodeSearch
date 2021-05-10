@@ -2,6 +2,8 @@
 
 #include "../models/meta.h"
 
+//namespace stop {
+
 int main() {
     try {
         Meta cur_meta;
@@ -10,4 +12,7 @@ int main() {
     } catch (const std::exception &ex) {
         std::cout << ex.what() << std::endl;
     }
+    return 0;
 }
+
+//} // namespace stop

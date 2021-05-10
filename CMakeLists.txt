@@ -37,7 +37,7 @@ target_link_libraries(stop models)
 target_link_libraries(search models)
 target_link_libraries(configs models)
 target_link_libraries(files models)
-target_link_libraries(hello_test models)
+target_link_libraries(all_tests models)
 target_link_libraries(search_benchmark models)
 
 set_target_properties(start stop search configs files models
