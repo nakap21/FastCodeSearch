@@ -69,6 +69,19 @@ size_t LoadCntIndexes(const std::string &file_path) {
     }
 }
 
+int LoadCapFilesCnt(const std::string &file_path) {
+    try {
+        std::ifstream file{file_path};
+        binary_iarchive ia{file};
+        int cnt;
+        ia >> cnt;
+        return cnt;
+    } catch (const std::exception &ex) {
+        auto err = std::string(ex.what());
+        throw std::runtime_error("Can't load file " + file_path + ": " + err);
+    }
+}
+
 void Shards::Clear() {
     for (size_t i = 0; i < files_cnt_on_shrads.size(); ++i) {
         auto index_file_name = GetIndexFileName(i);

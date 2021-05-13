@@ -89,6 +89,10 @@ void Meta::SetFilesFormatsIgnore(const unordered_set<std::string> &new_value) {
     files_formats_ignore.value = new_value;
 }
 
+void Meta::SetCapFilesCnt(int new_value) {
+    cap_files_cnt.value = new_value;
+}
+
 void Meta::Clear() {
     try {
         fs::remove("meta_info.bin");
@@ -116,6 +120,17 @@ void Meta::SaveFilePathsById() {
     } catch (const std::exception &ex) {
         auto err = std::string(ex.what());
         throw std::runtime_error("Can't save files_path_by_id.bin: " + err);
+    }
+}
+
+void Meta::SaveCapFilesCnt() {
+    try {
+        std::ofstream file{"cap_files_cnt.bin"};
+        binary_oarchive oa{file};
+        oa << cap_files_cnt.value;
+    } catch (const std::exception &ex) {
+        auto err = std::string(ex.what());
+        throw std::runtime_error("Can't save cap_files_cnt.bin: " + err);
     }
 }
 

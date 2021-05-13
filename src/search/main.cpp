@@ -18,15 +18,19 @@ int main(int argc, char *argv[]) {
         auto cnt_indexes = LoadCntIndexes();
         auto indexes = LoadIndexes(cnt_indexes);
         auto file_paths_by_id = LoadFilePathsById();
+        auto cap_result = LoadCapFilesCnt();
         auto result = Search(query, indexes, file_paths_by_id);
 
         int cnt = 0;
-
+        std::cout << "NAKAP " << cap_result << std::endl;
         for (const auto &shard: result) {
             for (const auto& shard_res: shard) {
+                if (++cnt > cap_result) {
+                    std::cout << "Search result is too large. It is truncated. Current result's count = " << cap_result << std::endl;
+                    return 0;
+                }
                 std::cout << "file = " << shard_res.file << ", offset = " << shard_res.offset << std::endl;
             }
-            cnt += shard.size();
         }
         std::cout << "Search result count = " << cnt << std::endl;
     } catch (const std::exception &ex) {

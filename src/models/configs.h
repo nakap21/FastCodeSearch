@@ -11,7 +11,7 @@ using namespace  boost::unordered;
 
 struct UpdateIntervalSec {
     std::string description = "Index update interval in seconds";
-    int value = 5; // TODO fix default value
+    int value = 5;
 private:
     friend class boost::serialization::access;
 
@@ -24,7 +24,7 @@ private:
 
 struct CntFilesInShard {
     std::string description = "Count of files per shard";
-    int value = 200; // TODO fix default value
+    int value = 200;
 private:
     friend class boost::serialization::access;
 
@@ -37,7 +37,7 @@ private:
 
 struct MaxSizeIndexFile {
     std::string description = "Max size files in index";
-    int value = 15971520; // TODO fix default value
+    int value = 15971520;
 private:
     friend class boost::serialization::access;
 
@@ -51,7 +51,20 @@ private:
 struct FilesFormatsIgnore {
     std::string description = "Max size files in index";
     unordered_set<std::string> value = {".tsv", ".gitignore", ".tsv", ".csv", ".reference", ".png",
-                                             ".pdf", ".git", ".gif", ".svg"}; // TODO fix default value
+                                             ".pdf", ".git", ".gif", ".svg"};
+private:
+    friend class boost::serialization::access;
+
+    template<class Archive>
+    void serialize(Archive &archive, const unsigned int version) {
+        archive & BOOST_SERIALIZATION_NVP(description);
+        archive & BOOST_SERIALIZATION_NVP(value);
+    }
+};
+
+struct CapFilesCnt {
+    std::string description = "The capacity of search result";
+    int value = 10000;
 private:
     friend class boost::serialization::access;
 

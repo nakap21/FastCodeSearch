@@ -14,6 +14,8 @@ void UpdateConfig(const std::string &config_name, const std::vector<std::string>
     } else if (config_name == "FILES_FORMATS_IGNORE") {
         unordered_set<std::string> new_formats(value.begin(), value.end());
         meta.SetFilesFormatsIgnore(new_formats);
+    } else if (config_name == "CAP_FILES_CNT") {
+        meta.SetCapFilesCnt(std::stoi(value[0]));
     } else {
         std::cout << "WARNING! There is no config with name " << config_name << std::endl;
     }
@@ -33,4 +35,6 @@ void ShowConfigsValue() {
         std::cout << "\"" << type << "\" ";
     }
     std::cout << "}" << std::endl;
+    std::cout << "CAP_FILES_CNT | " << meta.GetCapFilesCnt().description << " | "
+              << meta.GetCapFilesCnt().value << std::endl;
 }

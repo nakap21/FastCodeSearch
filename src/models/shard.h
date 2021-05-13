@@ -14,6 +14,8 @@ using namespace boost::unordered;
 
 size_t LoadCntIndexes(const std::string& file_path = "cnt_indexes.bin");
 
+int LoadCapFilesCnt(const std::string& file_path = "cap_files_cnt.bin");
+
 class Shards {
 public:
     void AddFile(int, const Meta &);

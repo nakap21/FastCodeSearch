@@ -26,6 +26,8 @@ public:
 
     void SetMaxSizeIndexFile(int);
 
+    void SetCapFilesCnt(int);
+
     int AddFile(const std::string &);
 
     void DeleteFile(const std::string &);
@@ -42,6 +44,8 @@ public:
 
     const FilesFormatsIgnore &GetFilesFormatsIgnore() const { return files_formats_ignore; }
 
+    const CapFilesCnt &GetCapFilesCnt() const { return cap_files_cnt; }
+
     const unordered_map<int, time_t> &GetFiles() const { return files; }
 
     bool ShouldStopEngine() { return should_stop_engine; }
@@ -51,6 +55,8 @@ public:
     const std::vector<std::string> &GetPaths() const { return file_paths; }
 
     void SaveFilePathsById();
+
+    void SaveCapFilesCnt();
 
 private:
     friend class boost::serialization::access;
@@ -62,6 +68,7 @@ private:
         archive & BOOST_SERIALIZATION_NVP(cnt_files_in_shard);
         archive & BOOST_SERIALIZATION_NVP(max_size_index_file);
         archive & BOOST_SERIALIZATION_NVP(files_formats_ignore);
+        archive & BOOST_SERIALIZATION_NVP(cap_files_cnt);
         archive & BOOST_SERIALIZATION_NVP(files);
         archive & BOOST_SERIALIZATION_NVP(file_paths);
     }
@@ -71,6 +78,7 @@ private:
     CntFilesInShard cnt_files_in_shard;
     MaxSizeIndexFile max_size_index_file;
     FilesFormatsIgnore files_formats_ignore;
+    CapFilesCnt cap_files_cnt;
     unordered_map<int, time_t> files;
     std::vector<std::string> file_paths;
 };

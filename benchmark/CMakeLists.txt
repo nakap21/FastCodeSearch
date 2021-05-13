@@ -12,6 +12,7 @@ add_executable(
         ../src/models/meta.cpp
         ../src/models/index.cpp
         ../src/models/shard.cpp
+        ../src/start/updates.cpp
 )
 
 target_link_libraries(
