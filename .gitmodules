@@ -1,0 +1,9 @@
+[submodule "src/libs/boost-cmake"]
+	path = src/libs/boost-cmake
+	url = https://github.com/Orphis/boost-cmake.git
+[submodule "src/libs/abseil-cpp"]
+	path = src/libs/abseil-cpp
+	url = https://github.com/abseil/abseil-cpp.git
+[submodule "src/libs/re2"]
+	path = src/libs/re2
+	url = https://github.com/google/re2.git

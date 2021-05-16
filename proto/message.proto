@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+message Index {
+  repeated int32 trigrams = 1;
+  repeated Files files = 2;
+}
+
+message Files {
+  repeated int32 files_ids = 1;
+}
